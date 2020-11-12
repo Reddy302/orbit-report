@@ -9,17 +9,17 @@ import { Satellite } from './satellite';
 })
 export class AppComponent {
   title = 'orbit-report';
-  sourceList: Array<Satellite>;
-  displayList: Array<Satellite>;
+  sourceList: Satellite[];
+  displayList: Satellite[];
   constructor() {
     this.sourceList = [];
     this.displayList = [];
-    let satellitesUrl: string = 'https://handlers.education.launchcode.org/static/satellites.json';
+    let satellitesUrl = 'https://handlers.education.launchcode.org/static/satellites.json';
 
     window.fetch(satellitesUrl).then(function(response){
       response.json().then(function(data){
         let fetchedSatellites = data.satellites;
-        for(let i: number =0; i < fetchedSatellites.length; i++){
+        for(let i = 0; i < fetchedSatellites.length; i++){
           let ns = new Satellite(fetchedSatellites[i].name, fetchedSatellites[i].type, fetchedSatellites[i].launchDate, fetchedSatellites[i].orbitType, fetchedSatellites[i].operational);
           this.sourceList.push(ns);
         }
@@ -27,13 +27,27 @@ export class AppComponent {
       }.bind(this));
     }.bind(this));
   }
-  search(searchTerm: string): void {
+  search(searchTerm: string, category: any): void {
     let matchingSatellites: Satellite[] = [];
     searchTerm = searchTerm.toLowerCase();
+    category = document.getElementById('match');
+
     for(let i=0; i < this.sourceList.length; i++){
-      let name = this.sourceList[i].name.toLowerCase();
-      if(name.indexOf(searchTerm) >= 0){
-        matchingSatellites.push(this.sourceList[i]);
+      if (category.value === 'name') {
+        let name = this.sourceList[i].name.toLowerCase();
+        if(name.indexOf(searchTerm) >= 0){
+          matchingSatellites.push(this.sourceList[i]);
+        }
+      } else if (category.value === 'type') {
+        let type =this.sourceList[i].type.toLowerCase();
+        if (type.indexOf(searchTerm) >= 0) {
+          matchingSatellites.push(this.sourceList[i]);
+        }
+      } else if (category.value === 'orbitType') {
+        let orbitType =this.sourceList[i].orbitType.toLowerCase();
+        if (orbitType.indexOf(searchTerm) >= 0) {
+          matchingSatellites.push(this.sourceList[i]);
+        }
       }
     }
     this.displayList = matchingSatellites;
